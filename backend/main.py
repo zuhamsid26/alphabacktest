@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from contextlib import asynccontextmanager
 import uvicorn
-from routes import backtest_router, data_router
+from routes import backtest_router, data_router, sentiment_router
 from utils.logger import get_logger
 from database import engine
 from models import backtest_run
@@ -36,6 +36,7 @@ app.add_middleware(
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.include_router(backtest_router, prefix="/api")
 app.include_router(data_router, prefix="/api")
+app.include_router(sentiment_router, prefix="/api")
 
 @app.get("/health")
 async def health_check():
