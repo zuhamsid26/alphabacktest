@@ -5,8 +5,8 @@ export default function Navbar({ activeTab, onTabChange }) {
     { id: 'backtest', label: 'Run Backtest' },
     { id: 'compare', label: 'Compare Strategies' },
     { id: 'upload', label: 'Data Manager' },
+    { id: 'history', label: 'History' },
   ]
-
   return (
     <header className="border-b border-gray-800 bg-gray-950/80 backdrop-blur sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,7 +20,6 @@ export default function Navbar({ activeTab, onTabChange }) {
               <p className="text-xs text-gray-500">ML Strategy Engine</p>
             </div>
           </div>
-
           <nav className="flex gap-1">
             {tabs.map((tab) => (
               <button
@@ -36,7 +35,6 @@ export default function Navbar({ activeTab, onTabChange }) {
               </button>
             ))}
           </nav>
-
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <Activity className="w-3.5 h-3.5 text-emerald-500" />
             <span>Live</span>

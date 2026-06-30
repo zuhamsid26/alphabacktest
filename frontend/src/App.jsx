@@ -3,10 +3,10 @@ import Navbar from './components/Navbar'
 import BacktestPage from './pages/BacktestPage'
 import ComparePage from './pages/ComparePage'
 import UploadPage from './pages/UploadPage'
+import HistoryPage from './pages/HistoryPage'
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('backtest')
-
   return (
     <div className="min-h-screen bg-gray-950">
       <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
@@ -14,6 +14,7 @@ export default function App() {
         {activeTab === 'backtest' && <BacktestPage />}
         {activeTab === 'compare' && <ComparePage />}
         {activeTab === 'upload' && <UploadPage />}
+        {activeTab === 'history' && <HistoryPage />}
       </main>
     </div>
   )
