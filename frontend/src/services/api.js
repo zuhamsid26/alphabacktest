@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-// ✅ Always use nginx route
+// âœ… Always use nginx route
 const api = axios.create({
   baseURL: '/api',
   timeout: 120000,
@@ -68,3 +68,6 @@ export const healthCheck = () =>
 // History
 export const getHistory = (limit = 20) =>
   api.get(`/backtest/history?limit=${limit}`).then((r) => r.data)
+// Live Sentiment
+export const getLiveSentiment = (stock, daysBack = 3) =>
+  api.get(`/sentiment/live?stock=${stock}&days_back=${daysBack}`).then((r) => r.data)

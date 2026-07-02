@@ -6,6 +6,7 @@ export default function Navbar({ activeTab, onTabChange }) {
     { id: 'compare', label: 'Compare Strategies' },
     { id: 'upload', label: 'Data Manager' },
     { id: 'history', label: 'History' },
+    { id: 'sentiment', label: 'Live Sentiment' },
   ]
   return (
     <header className="border-b border-gray-800 bg-gray-950/80 backdrop-blur sticky top-0 z-50">

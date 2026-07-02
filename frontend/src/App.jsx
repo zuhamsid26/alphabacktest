@@ -4,6 +4,7 @@ import BacktestPage from './pages/BacktestPage'
 import ComparePage from './pages/ComparePage'
 import UploadPage from './pages/UploadPage'
 import HistoryPage from './pages/HistoryPage'
+import SentimentPage from './pages/SentimentPage'
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('backtest')
@@ -15,6 +16,7 @@ export default function App() {
         {activeTab === 'compare' && <ComparePage />}
         {activeTab === 'upload' && <UploadPage />}
         {activeTab === 'history' && <HistoryPage />}
+        {activeTab === 'sentiment' && <SentimentPage />}
       </main>
     </div>
   )
