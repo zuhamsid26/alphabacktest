@@ -148,7 +148,10 @@ export default function StrategyPanel({ onRun, loading, onReset }) {
             value={(params.train_pct * 100).toFixed(0)}
             min={50}
             max={90}
-            onChange={(e) => set('train_pct', Number(e.target.value) / 100)}
+            onChange={(e) => {
+              const pct = Math.min(90, Math.max(50, Number(e.target.value) || 50))
+              set('train_pct', pct / 100)
+            }}
           />
           <p className="text-xs text-gray-600 mt-1">Backtest runs on the remaining test set</p>
         </div>

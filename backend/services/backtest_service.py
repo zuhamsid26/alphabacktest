@@ -65,7 +65,7 @@ def load_and_merge(
         inplace=True,
     )
 
-    price = pd.read_csv(price_path, parse_dates=["date"])
+    price = pd.read_csv(price_path, parse_dates=["date"], dayfirst=True)
     for col in ["open", "high", "low", "close"]:
         if col in price.columns:
             price[col] = (

@@ -96,7 +96,10 @@ export default function ComparePanel({ onCompare, loading }) {
           <label className="label">Train Split (%)</label>
           <input type="number" className="input-field"
             value={(params.train_pct * 100).toFixed(0)} min={50} max={90}
-            onChange={(e) => set('train_pct', Number(e.target.value) / 100)} />
+            onChange={(e) => {
+              const pct = Math.min(90, Math.max(50, Number(e.target.value) || 50))
+              set('train_pct', pct / 100)
+            }} />
         </div>
       </div>
 

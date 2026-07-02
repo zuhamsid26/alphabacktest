@@ -11,10 +11,18 @@ const api = axios.create({
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    const msg =
-      err.response?.data?.detail ||
-      err.message ||
-      'Unknown error'
+    const detail = err.response?.data?.detail
+    let msg
+
+    if (Array.isArray(detail)) {
+      // FastAPI/Pydantic validation errors come as an array of {loc, msg, type}
+      msg = detail.map((d) => d.msg).join('; ')
+    } else if (typeof detail === 'string') {
+      msg = detail
+    } else {
+      msg = err.message || 'Unknown error'
+    }
+
     return Promise.reject(new Error(msg))
   }
 )
