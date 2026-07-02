@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from contextlib import asynccontextmanager
+import os
 import uvicorn
 from routes import backtest_router, data_router, sentiment_router
 from utils.logger import get_logger
@@ -25,9 +26,12 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+default_origins = "http://localhost:5173,http://localhost:3000,http://frontend:5173"
+allowed_origins = os.getenv("ALLOWED_ORIGINS", default_origins).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://frontend:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,11 +48,7 @@ async def health_check():
 
 @app.get("/")
 async def root():
-    return {
-        "name": "Nifty50 Backtest API",
-        "docs": "/docs",
-        "health": "/health",
-    }
+    return {"name": "Nifty50 Backtest API", "docs": "/docs", "health": "/health"}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
