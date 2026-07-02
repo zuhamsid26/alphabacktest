@@ -1,255 +1,159 @@
-# 📈 Nifty50 ML Backtester — Production Web App
+# AlphaBacktest
 
-A full-stack, production-ready backtesting platform for Nifty 50 ML trading strategies.  
-Built with **FastAPI + React + Tailwind CSS**, containerised with **Docker**.
+A full-stack quantitative backtesting platform for Nifty 50 equities, combining momentum indicators, live news sentiment analysis, and a hybrid ML strategy — with a FastAPI backend, React/Vite frontend, and persistent run history.
+
+**Live demo:** [alphabacktest.vercel.app](https://alphabacktest.vercel.app)
+**API:** [alphabacktest-api.onrender.com](https://alphabacktest-api.onrender.com/docs)
+
+> Note: the backend runs on Render's free tier, which spins down after periods of inactivity. The first request after idle time may take 30–50 seconds to respond while the instance wakes up.
 
 ---
 
-## 🗂 Project Structure
+## Features
 
+- **Three trading strategies** — Momentum (technical indicators), Sentiment (news-driven), and Hybrid ML (logistic regression signal), each independently backtestable and configurable
+- **Live market sentiment** — real-time news sentiment scoring for any of the Nifty 50 stocks, using VADER sentiment analysis over financial-news-domain-filtered articles from NewsAPI
+- **Strategy comparison** — run multiple strategies side by side against the same test window and compare CAGR, Sharpe ratio, max drawdown, and win rate
+- **Historical run tracking** — every backtest is persisted to a database, with a dedicated history view to review past runs
+- **Custom dataset upload** — upload your own price/fused datasets to backtest against instead of the bundled Nifty 50 historical data
+- **Interactive equity curve and drawdown visualization** — built with Recharts
+
+## Tech Stack
+
+**Backend**
+- FastAPI (Python) with async lifespan management
+- SQLAlchemy + SQLite for run persistence
+- pandas / numpy for data processing and backtest simulation
+- VADER (`vaderSentiment`) for sentiment scoring
+- NewsAPI for live financial news retrieval
+
+**Frontend**
+- React 18 + Vite
+- Tailwind CSS
+- Recharts for equity/drawdown charts
+- Axios for API communication
+
+**Infrastructure**
+- Backend deployed on Render (Docker)
+- Frontend deployed on Vercel
+- Dockerized local development via `docker-compose`
+
+## Architecture
+```bash
+┌──────────────┐        HTTPS        ┌──────────────┐
+│   Frontend   │ ──────────────────▶ │   Backend    │
+│  (Vercel)    │ ◀────────────────── │  (Render)    │
+│  React+Vite  │        JSON         │   FastAPI    │
+└──────────────┘                     └──────┬───────┘
+                                             │
+                    ┌────────────────────────┼────────────────────────┐
+                    ▼                        ▼                        ▼
+              ┌───────────┐          ┌──────────────┐          ┌────────────┐
+              │  SQLite   │          │   NewsAPI     │          │  CSV Data  │
+              │ (history) │          │ (live news)   │          │ (backtest) │
+              └───────────┘          └──────────────┘          └────────────┘
 ```
-nifty50-backtester/
-│
+## Getting Started
+
+### Prerequisites
+
+- Python 3.11+
+- Node.js 20+
+- A free [NewsAPI.org](https://newsapi.org) API key (for the live sentiment feature)
+
+### Local setup
+
+**1. Clone the repo**
+```bash
+git clone https://github.com/ziak38186-svg/alphabacktest.git
+cd alphabacktest
+```
+
+**2. Backend**
+```bash
+cd backend
+pip install -r ../requirements.txt
+cp .env.example .env
+# edit .env and add your NEWS_API_KEY
+
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+Backend runs at `http://localhost:8000`, docs at `http://localhost:8000/docs`.
+
+**3. Frontend** (in a separate terminal)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Frontend runs at `http://localhost:5173`.
+
+### Running with Docker
+
+```bash
+docker-compose up --build
+```
+Backend available at `http://localhost:8000`, frontend at `http://localhost:80`.
+
+## Environment Variables
+
+**Backend** (`backend/.env`)
+| Variable | Description | Required |
+|---|---|---|
+| `NEWS_API_KEY` | API key from newsapi.org, used for live sentiment | Yes (for sentiment feature) |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins | No (defaults to localhost) |
+
+**Frontend** (`frontend/.env`)
+| Variable | Description | Required |
+|---|---|---|
+| `VITE_API_URL` | Base URL of the backend API | No (defaults to relative `/api`, used behind nginx) |
+
+## Project Structure
+```bash
+alphabacktest/
 ├── backend/
-│   ├── main.py                    # FastAPI app entry point
-│   ├── routes/
-│   │   ├── backtest.py            # POST /api/backtest/run, /compare
-│   │   └── data.py                # POST /api/data/upload, GET /api/data/files
-│   ├── services/
-│   │   └── backtest_service.py    # Core engine (load, split, signal, backtest, metrics)
-│   ├── models/
-│   │   └── schemas.py             # Pydantic request/response models
-│   ├── utils/
-│   │   └── logger.py              # Structured logging + timer decorator
-│   └── data/                      # Default datasets (bundled)
-│       ├── fused_dataset.csv
-│       ├── Nifty50_Master_Cleaned_Full.csv
-│       ├── sentiment_daily.csv
-│       ├── momentum_features.csv
-│       └── clean_price_master.csv
-│
+│   ├── main.py                  # FastAPI app entry point
+│   ├── database.py              # SQLAlchemy engine/session setup
+│   ├── models/                  # ORM models and Pydantic schemas
+│   ├── routes/                  # API route definitions
+│   ├── services/                # Business logic (backtest engine, sentiment)
+│   ├── data/                    # Bundled Nifty 50 historical datasets
+│   └── utils/                   # Logging and shared utilities
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx                # Root with tab routing
-│   │   ├── main.jsx               # React entry point
-│   │   ├── index.css              # Tailwind + custom component classes
-│   │   ├── components/
-│   │   │   ├── Navbar.jsx         # Top navigation
-│   │   │   ├── StrategyPanel.jsx  # Strategy selector + parameter inputs
-│   │   │   ├── MetricsGrid.jsx    # 8-card performance dashboard
-│   │   │   ├── EquityChart.jsx    # Recharts area chart (single + compare)
-│   │   │   ├── DrawdownChart.jsx  # Recharts drawdown chart
-│   │   │   ├── TradeTable.jsx     # Sortable, paginated, CSV-exportable trade log
-│   │   │   ├── ComparePanel.jsx   # Multi-strategy comparison controls
-│   │   │   ├── ComparisonTable.jsx# Side-by-side metrics table
-│   │   │   └── UploadManager.jsx  # Drag-and-drop file uploader
-│   │   ├── pages/
-│   │   │   ├── BacktestPage.jsx   # Single strategy backtest view
-│   │   │   ├── ComparePage.jsx    # Multi-strategy comparison view
-│   │   │   └── UploadPage.jsx     # Dataset management view
-│   │   ├── hooks/
-│   │   │   └── useBacktest.js     # API state management hook
-│   │   └── services/
-│   │       └── api.js             # Axios API client
-│   ├── index.html
-│   ├── vite.config.js
-│   ├── tailwind.config.js
-│   └── package.json
-│
+│   │   ├── pages/                # Route-level views
+│   │   ├── components/          # Reusable UI components
+│   │   ├── services/             # API client
+│   │   └── App.jsx
 ├── Dockerfile.backend
 ├── Dockerfile.frontend
 ├── docker-compose.yml
 ├── nginx.conf
-├── requirements.txt
-└── README.md
+└── requirements.txt
 ```
 
----
+## API Overview
 
-## ⚡ Quick Start — Local Development
+Full interactive documentation is available at `/docs` (Swagger UI) on the running backend.
 
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- pip
+| Endpoint | Method | Description |
+|---|---|---|
+| `/api/backtest/run` | POST | Run a single strategy backtest |
+| `/api/backtest/compare` | POST | Run and compare multiple strategies |
+| `/api/backtest/strategies` | GET | List available strategies |
+| `/api/backtest/history` | GET | Fetch past backtest runs |
+| `/api/data/upload` | POST | Upload a custom dataset |
+| `/api/data/files` | GET | List uploaded files |
+| `/api/sentiment/live` | GET | Fetch live news sentiment for a stock |
+| `/health` | GET | Health check |
 
----
+## Known Limitations
 
-### 1. Backend Setup
+- **Live sentiment does not feed into the backtest engine.** The "Live Sentiment" tab is a standalone, real-time lookup tool. The backtest strategies (including "Sentiment Only") run against a static, pre-computed sentiment column in the historical dataset — they don't currently query live news.
+- **Render free-tier storage is ephemeral.** Backtest history stored in SQLite resets on redeploy or extended inactivity, since the free tier doesn't persist disk state.
+- **NewsAPI free tier** has request-volume and date-range limitations; heavy usage may hit rate limits.
+- **Sentiment coverage varies by stock.** Larger, more frequently covered companies return more relevant news; smaller-cap stocks may return sparse or generic results despite domain filtering.
 
-```bash
-# From project root
-cd nifty50-backtester
+## License
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Start backend
-cd backend
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-API will be live at: http://localhost:8000  
-Interactive docs: http://localhost:8000/docs
-
----
-
-### 2. Frontend Setup
-
-```bash
-# From project root (new terminal)
-cd nifty50-backtester/frontend
-
-# Install dependencies
-npm install
-
-# Copy environment file
-cp .env.example .env
-
-# Start dev server
-npm run dev
-```
-
-Frontend will be live at: http://localhost:5173
-
----
-
-## 🐳 Docker — Full Stack
-
-```bash
-# From project root
-cd nifty50-backtester
-
-# Build and start both services
-docker-compose up --build
-
-# Run in background
-docker-compose up --build -d
-
-# View logs
-docker-compose logs -f backend
-docker-compose logs -f frontend
-
-# Stop
-docker-compose down
-```
-
-- **Frontend**: http://localhost (port 80)
-- **Backend API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
-
----
-
-## 🔌 API Reference
-
-### Run Backtest
-```
-POST /api/backtest/run
-Content-Type: application/json
-
-{
-  "strategy": "momentum",          // "momentum" | "sentiment" | "hybrid_ml"
-  "initial_capital": 100000,
-  "hold_days": 5,
-  "position_size_pct": 0.02,
-  "transaction_cost": 0.001,
-  "train_pct": 0.70,
-  "momentum_threshold": 0.5,
-  "sentiment_threshold": 0.1
-}
-```
-
-Response includes: `metrics`, `equity_curve`, `drawdown`, `trades`, `run_id`
-
-### Compare Strategies
-```
-POST /api/backtest/compare
-Content-Type: application/json
-
-{
-  "strategies": ["momentum", "sentiment", "hybrid_ml"],
-  "initial_capital": 100000,
-  "hold_days": 5,
-  ...
-}
-```
-
-### Upload Dataset
-```
-POST /api/data/upload
-Content-Type: multipart/form-data
-
-file: <your_file.csv>
-```
-
-### Other Endpoints
-```
-GET  /api/backtest/strategies    # List available strategies
-GET  /api/data/files             # List uploaded files
-DELETE /api/data/files/{name}    # Delete an uploaded file
-GET  /health                     # Health check
-GET  /docs                       # Swagger UI
-```
-
----
-
-## 📊 Strategies
-
-| Strategy | Signal Column | Type | Default Threshold |
-|----------|--------------|------|-------------------|
-| Momentum Only | `Momentum_score` | Continuous | > 0.5 |
-| Sentiment Only | `Sentiment_score` | Continuous | > 0.1 |
-| Hybrid ML | `BUY` | Binary (0/1) | — |
-
----
-
-## 📈 Performance Metrics
-
-| Metric | Description |
-|--------|-------------|
-| CAGR | Compound Annual Growth Rate |
-| Sharpe Ratio | Risk-adjusted return (annualised) |
-| Max Drawdown | Worst peak-to-trough decline |
-| Win Rate | % of profitable trades |
-| Total Trades | Number of completed round-trips |
-| Total PnL | Gross profit and loss in ₹ |
-| Final Capital | Portfolio value at end of test period |
-
----
-
-## 🔧 Configuration
-
-All parameters can be set from the UI. Backend defaults:
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `initial_capital` | ₹1,00,000 | Starting portfolio value |
-| `hold_days` | 5 | Trading days to hold each position |
-| `position_size_pct` | 2% | Capital allocated per signal |
-| `transaction_cost` | 0.1% | Cost per leg (entry + exit) |
-| `train_pct` | 70% | Train/test time-series split |
-
----
-
-## 🛠 Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Backend | FastAPI, Pydantic v2, Pandas, NumPy |
-| Frontend | React 18, Vite, Tailwind CSS, Recharts |
-| Containerisation | Docker, Docker Compose, Nginx |
-| Data | CSV / XLS / XLSX (Nifty 50 OHLCV + features) |
-
----
-
-## 📝 Notes
-
-- The backtest engine uses a **time-based 70/30 train/test split** — no look-ahead bias
-- Entry is at next-day **OPEN**; exit is at **CLOSE** after `hold_days`
-- Transaction costs are charged on **both** entry and exit legs
-- All remaining positions are force-closed at end of test period
-- The `Hybrid ML` strategy uses the pre-computed `BUY` column (Logistic Regression output from the notebook)
+This project is available for reference and educational purposes.
