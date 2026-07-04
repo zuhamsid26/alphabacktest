@@ -154,6 +154,10 @@ Full interactive documentation is available at `/docs` (Swagger UI) on the runni
 - **NewsAPI free tier** has request-volume and date-range limitations; heavy usage may hit rate limits.
 - **Sentiment coverage varies by stock.** Larger, more frequently covered companies return more relevant news; smaller-cap stocks may return sparse or generic results despite domain filtering.
 
+## Acknowledgments
+
+This project builds on earlier work from a college club initiative, independently extended and redeployed by me.
+
 ## License
 
 This project is available for reference and educational purposes.
