@@ -17,7 +17,7 @@ export default function Navbar({ activeTab, onTabChange }) {
               <TrendingUp className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-white tracking-tight">Nifty50 Backtester</h1>
+              <h1 className="text-base font-bold text-white tracking-tight">AlphaBacktest</h1>
               <p className="text-xs text-gray-500">ML Strategy Engine</p>
             </div>
           </div>

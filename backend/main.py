@@ -13,15 +13,15 @@ logger = get_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Nifty50 Backtester API starting up...")
+    logger.info("AlphaBacktest API starting up...")
     backtest_run.Base.metadata.create_all(bind=engine)
     logger.info("Database tables created.")
     yield
-    logger.info("Nifty50 Backtester API shutting down...")
+    logger.info("AlphaBacktest API shutting down...")
 
 app = FastAPI(
-    title="Nifty50 Backtest API",
-    description="Production-ready backtesting engine for Nifty 50 ML strategies",
+    title="AlphaBacktest API",
+    description="Full-stack backtesting engine for Nifty 50 ML strategies",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -48,7 +48,7 @@ async def health_check():
 
 @app.get("/")
 async def root():
-    return {"name": "Nifty50 Backtest API", "docs": "/docs", "health": "/health"}
+    return {"name": "AlphaBacktest API", "docs": "/docs", "health": "/health"}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
