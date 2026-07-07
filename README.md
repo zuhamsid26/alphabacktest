@@ -65,7 +65,7 @@ A full-stack quantitative backtesting platform for Nifty 50 equities, combining 
 
 **1. Clone the repo**
 ```bash
-git clone https://github.com/ziak38186-svg/alphabacktest.git
+git clone https://github.com/zuhamsid26/alphabacktest.git
 cd alphabacktest
 ```
 
