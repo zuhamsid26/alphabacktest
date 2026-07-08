@@ -5,13 +5,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
-    container_name: nifty50_backend
+    container_name: alphabacktest_backend
     restart: unless-stopped
     ports:
       - "8000:8000"
     volumes:
       - ./backend/data:/app/data:ro
-      - uploads_vol:/app/uploads
       - logs_vol:/app/logs
     environment:
       - PYTHONUNBUFFERED=1
@@ -26,7 +25,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
-    container_name: nifty50_frontend
+    container_name: alphabacktest_frontend
     restart: unless-stopped
     ports:
       - "80:80"
@@ -35,5 +34,4 @@ services:
         condition: service_healthy
 
 volumes:
-  uploads_vol:
   logs_vol:
