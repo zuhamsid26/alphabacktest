@@ -84,7 +84,10 @@ def fetch_live_sentiment(stock_symbol: str, days_back: int = 3) -> dict:
     if not NEWS_API_KEY:
         raise ValueError("NEWS_API_KEY not configured. Add it to backend/.env")
 
-    query_name = STOCK_NAME_MAP.get(stock_symbol.upper(), stock_symbol)
+    symbol = stock_symbol.upper().strip()
+    if symbol not in STOCK_NAME_MAP:
+        raise ValueError(f"'{stock_symbol}' is not a supported Nifty 50 stock symbol.")
+    query_name = STOCK_NAME_MAP[symbol]
     quote_char = chr(34)
     exact_query = quote_char + query_name + quote_char
     from_date = (datetime.now() - timedelta(days=days_back)).strftime("%Y-%m-%d")
