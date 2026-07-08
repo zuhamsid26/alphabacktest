@@ -3,7 +3,6 @@ from .schemas import (
     BacktestResponse,
     CompareRequest,
     CompareResponse,
-    UploadResponse,
     MetricsResponse,
     EquityPoint,
     TradeRecord,

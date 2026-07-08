@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ .
 
-RUN mkdir -p uploads logs
+RUN mkdir -p logs
 
 EXPOSE 8000
 

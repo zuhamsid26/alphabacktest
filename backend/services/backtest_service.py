@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
 import uuid
-import os
 from pathlib import Path
-from typing import Optional
 
 from models.schemas import (
     BacktestRequest,
@@ -17,8 +15,6 @@ from models.schemas import (
 )
 
 DATA_DIR = Path(__file__).parent.parent / "data"
-UPLOAD_DIR = Path(__file__).parent.parent / "uploads"
-UPLOAD_DIR.mkdir(exist_ok=True)
 
 STRATEGY_CONFIG = {
     StrategyType.momentum: {
@@ -37,14 +33,6 @@ STRATEGY_CONFIG = {
         "name": "Hybrid ML",
     },
 }
-
-
-def _resolve_path(filename: Optional[str], default: str) -> Path:
-    if filename:
-        candidate = UPLOAD_DIR / filename
-        if candidate.exists():
-            return candidate
-    return DATA_DIR / default
 
 
 def load_and_merge(
@@ -283,8 +271,8 @@ def run_backtest_core(
 
 
 def execute_backtest(request: BacktestRequest) -> dict:
-    fused_path = _resolve_path(request.fused_filename, "fused_dataset.csv")
-    price_path = _resolve_path(request.price_filename, "Nifty50_Master_Cleaned_Full.csv")
+    fused_path = DATA_DIR / "fused_dataset.csv"
+    price_path = DATA_DIR / "Nifty50_Master_Cleaned_Full.csv"
 
     if not fused_path.exists():
         raise FileNotFoundError(f"Fused dataset not found: {fused_path}")

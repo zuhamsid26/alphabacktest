@@ -4,7 +4,6 @@ export default function Navbar({ activeTab, onTabChange }) {
   const tabs = [
     { id: 'backtest', label: 'Run Backtest' },
     { id: 'compare', label: 'Compare Strategies' },
-    { id: 'upload', label: 'Data Manager' },
     { id: 'history', label: 'History' },
     { id: 'sentiment', label: 'Live Sentiment' },
   ]

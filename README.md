@@ -15,7 +15,6 @@ A full-stack quantitative backtesting platform for Nifty 50 equities, combining 
 - **Live market sentiment** — real-time news sentiment scoring for any of the Nifty 50 stocks, using VADER sentiment analysis over financial-news-domain-filtered articles from NewsAPI
 - **Strategy comparison** — run multiple strategies side by side against the same test window and compare CAGR, Sharpe ratio, max drawdown, and win rate
 - **Historical run tracking** — every backtest is persisted to a database, with a dedicated history view to review past runs
-- **Custom dataset upload** — upload your own price/fused datasets to backtest against instead of the bundled Nifty 50 historical data
 - **Interactive equity curve and drawdown visualization** — built with Recharts
 
 ## Tech Stack
@@ -142,8 +141,6 @@ Full interactive documentation is available at `/docs` (Swagger UI) on the runni
 | `/api/backtest/compare` | POST | Run and compare multiple strategies |
 | `/api/backtest/strategies` | GET | List available strategies |
 | `/api/backtest/history` | GET | Fetch past backtest runs |
-| `/api/data/upload` | POST | Upload a custom dataset |
-| `/api/data/files` | GET | List uploaded files |
 | `/api/sentiment/live` | GET | Fetch live news sentiment for a stock |
 | `/health` | GET | Health check |
 

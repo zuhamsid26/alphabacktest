@@ -18,8 +18,6 @@ class BacktestRequest(BaseModel):
     train_pct: float = Field(default=0.70, ge=0.5, le=0.9)
     momentum_threshold: float = Field(default=0.5)
     sentiment_threshold: float = Field(default=0.1)
-    fused_filename: Optional[str] = None
-    price_filename: Optional[str] = None
 
 
 class MetricsResponse(BaseModel):
@@ -73,13 +71,6 @@ class CompareRequest(BaseModel):
 class CompareResponse(BaseModel):
     results: Dict[str, Any]
     comparison_table: List[Dict[str, Any]]
-
-
-class UploadResponse(BaseModel):
-    filename: str
-    rows: int
-    columns: List[str]
-    message: str
 
 
 class ErrorResponse(BaseModel):
